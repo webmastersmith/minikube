@@ -5,7 +5,7 @@ metadata:
   labels:
     pod: helloworld  # name to reference for Service file.
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       pod: helloworld
