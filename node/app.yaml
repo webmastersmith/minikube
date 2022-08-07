@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-development   # name of deployment
+  labels:
+    pod: helloworld  # name to reference for Service file.
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: helloworld
+  template:
+    metadata:
+      labels:
+        pod: helloworld
+    spec:
+      containers:
+      - resources:
+          requests:
+            cpu: "50m"
+            memory: "256Mi"
+          limits:
+            cpu: "2000m"
+            memory: "4096Mi"
+        name: helloworld  # docker container name.
+        image: bryonsmith/node-helloworld:latest  # docker image to pull
+        imagePullPolicy: IfNotPresent  # pull local first.
+        ports:
+          - name: helloworld-port  # name of port 
+            containerPort: 3000  # port pod is listening on.
+        # - name: discovery-port
+        #   containerPort: 50000
+    #   volumeMounts:
+    #     - name: jenkins-vol
+    #       mountPath: /var/jenkins_vol
+    # volumes:
+    #   - name: jenkins-vol
+    #     emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-service  # name of service. kubectl get service jenkins
+spec:
+  selector:  # Route service traffic to pods with label key:values matching this selector. 
+    pod: helloworld
+  type: LoadBalancer  #(ClusterIp (default), NodePort, LoadBalancer)
+  ports:
+    - protocol: TCP
+      port: 3000  # port to open on node for incoming request
+      targetPort: 3000  # port to pod is listening on.
+      #nodePort: (30000-32767)  # Expose the node port to the outside world.  nodePort is a static IP on the node.
