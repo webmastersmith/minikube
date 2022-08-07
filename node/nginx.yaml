@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: helloworld-development   # name of deployment
+  name: nginx-development   # name of deployment
   labels:
-    pod: helloworld  # name to reference for Service file.
+    pod: nginx  # name to reference for Service file.
 spec:
   replicas: 3
   selector:
     matchLabels:
-      pod: helloworld
+      pod: nginx
   template:
     metadata:
       labels:
-        pod: helloworld
+        pod: nginx
     spec:
       containers:
       - resources:
@@ -22,12 +22,12 @@ spec:
           limits:
             cpu: "2000m"
             memory: "4096Mi"
-        name: helloworld  # docker container name.
-        image: bryonsmith/node-helloworld:latest  # docker image to pull
+        name: nginx  # docker container name.
+        image: nginx:alpine  # docker image to pull
         imagePullPolicy: IfNotPresent  # pull local first.
         ports:
-          - name: helloworld-port  # name of port 
-            containerPort: 3000  # port pod is listening on.
+          - name: nginx-port  # name of port 
+            containerPort: 80  # port pod is listening on.
         # - name: discovery-port
         #   containerPort: 50000
     #   volumeMounts:
@@ -40,13 +40,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: helloworld-service  # name of service. kubectl get service jenkins
+  name: nginx  # name of service. kubectl get service jenkins
 spec:
   selector:  # Route service traffic to pods with label key:values matching this selector. 
-    pod: helloworld
-  type: LoadBalancer  #(ClusterIp (default), NodePort, LoadBalancer)
+    pod: nginx
+  type: ClusterIP  #(ClusterIp (default), NodePort, LoadBalancer)
   ports:
     - protocol: TCP
-      port: 3333  # port to open on node for incoming request
-      targetPort: 3000  # port to pod is listening on.
+      port: 80  # port to open on node for incoming request
+      targetPort: 80  # port to pod is listening on.
       #nodePort: (30000-32767)  # Expose the node port to the outside world.  nodePort is a static IP on the node.
