@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo-dev   # name of deployment
+  namespace: default
   labels:
     pod: mongo  # key:value to reference for Service file.
 spec:
@@ -47,3 +48,17 @@ spec:
     # volumes:
     #   - name: mongo-vol
     #     emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-svc  # name of service. kubectl get service jenkins
+spec:
+  #type: LoadBalancer  #(ClusterIp (default), NodePort, LoadBalancer)
+  selector:  # Route service traffic to pods/deployment with label key:values matching this selector. 
+    pod: mongo
+  ports:
+    - protocol: TCP
+      port: 27017  # port to open on node for incoming request
+      targetPort: 27017  # port to pod is listening on.
+      #nodePort: (30000-32767)  # Expose the node port to the outside world.  nodePort is a static IP on the node.

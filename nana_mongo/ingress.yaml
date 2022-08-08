@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress  # name of ingress. will overwrite other ingress files if name same.
+  annotations:
+      ingressClassName: ingress-nginx  # nginx needs to have class enabled.
+spec:
+  rules:
+  - http: # tells nginx that incoming request get forwarded to internal service
+      paths: # points to everything after the url: smithauto.us/(all this)
+      - path: /mongo
+        pathType: Prefix
+        backend: # targets the Service file 'ports:' section
+          service:
+            name: mongo-express-dashboard  #should be the same as Service.metadata.name
+            port:
+              number: 8081 # same as Service.spec.ports.port
