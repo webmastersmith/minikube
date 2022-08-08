@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-dev   # name of deployment
+  labels:
+    pod: mongo  # key:value to reference for Service file.
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: mongo  # should match Deployment metadata.labels.
+  template:
+    metadata:
+      labels:
+        pod: mongo  # should match Deployment metadata.labels.
+    spec:
+      containers:
+      - resources:
+          requests:
+            cpu: "50m"
+            memory: "256Mi"
+          limits:
+            cpu: "2000m"
+            memory: "4096Mi"
+        name: mongo  # docker container name.
+        image: mongo@sha256:5255f45e7f87b4404388205351ef69e5f6c018976b355729afa01014faf7792a # docker image to pull
+        imagePullPolicy: IfNotPresent  # pull local first.
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-root-password
+        ports:
+        - name: mongo-port  # name of port 
+          containerPort: 27017  # port pod is listening on.
+        # - name: discovery-port
+        #   containerPort: 50000
+    #   volumeMounts:
+    #     - name: mongo-vol
+    #       mountPath: /var/mongo_vol
+    # volumes:
+    #   - name: mongo-vol
+    #     emptyDir: {}
